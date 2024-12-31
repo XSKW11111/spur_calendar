@@ -4,7 +4,7 @@ import IconChevronRight from "@/components/Icons/IconChevronRight";
 
 const WeeklySwitchButton = ({week, onLeftClick, onRightClick}: {week: string, onLeftClick: () => void, onRightClick: () => void}) => {
     return (
-        <div className="bg-white flex flex-row gap-2 items-center justify-between border border-gray-200 py-2.5 px-2.5 rounded-md">
+        <div className="h-9 bg-white flex flex-row gap-2 items-center justify-between box-border border border-gray-200 py-2.5 px-2.5 rounded-md">
             <div onClick={onLeftClick} className="cursor-pointer flex items-center">
             <IconChevronLeft size={16} color="#000000" />
             </div>
