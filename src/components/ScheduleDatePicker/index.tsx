@@ -15,24 +15,21 @@ import {
 } from "@/components/ui/popover"
 
 const ScheduleDatePicker = ({ selectedDate, setSelectedDate, selectedTime, setSelectedTime}: { selectedDate: Date | undefined, setSelectedDate: React.Dispatch<React.SetStateAction<Date | undefined>>, selectedTime: string, setSelectedTime: React.Dispatch<React.SetStateAction<string>>}): React.ReactElement => {
-    
+
     const dayjs = useDayJs();
 
     const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedTime(event.target.value);
-
         const date = dayjs(selectedDate);
 
         const time = dayjs(event.target.value, "HH:mm");
         const newDate = date.set('hour', time.hour()).set('minute', time.minute()).toDate();
-        console.log("newDate", newDate);
         setSelectedDate(newDate);
       };
 
     return (
     <Popover>
       <PopoverTrigger asChild>
-
         <Button
           variant={"outline"}
           className={cn(

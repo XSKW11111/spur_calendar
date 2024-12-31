@@ -9,9 +9,12 @@ import { Separator } from "@/components/ui/separator"
 import { createClient } from '@/utils/supabase/client'
 import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 const ScheduleModal = (): React.ReactElement => {
     const subpabase = createClient();
+    const queryClient = useQueryClient();
+
     const [selectedDayInWeek, setSelectedDayInWeek] = useState<number>(0);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
     const [selectedTime, setSelectedTime] = useState<string>('');
@@ -24,40 +27,43 @@ const ScheduleModal = (): React.ReactElement => {
         setSelectedDate(undefined);
         setName('');
     };
+
     const InsertTestSuiteEvent = async () => {
         if (!selectedDate) {
-            toast({
-                title: 'Error',
-                description: 'Please select a date',
-                variant: 'destructive',
-            })
-            return;
+           throw new Error('Please select a date');
         }
-        else{
+
         const selectedDateTimestamp = selectedDate.toISOString();
-        console.log(selectedDateTimestamp);
         const { error } = await subpabase.from('TestSuiteEvent').insert({
             name: name,
             startTime: selectedDateTimestamp,
             weeklyRunDay: selectedDayInWeek,
         });
-        console.log({ error });
+
         if (error) {
+            throw error;
+        }
+    };
+
+    const useMutationInsertTestSuiteEvent = useMutation({
+        mutationFn: InsertTestSuiteEvent,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['TestSuitesEvent'] });
+            handleReset();
+        },
+        onError: (error) => {
             toast({
                 title: 'Error',
                 description: error.message,
                 variant: 'destructive',
             })
-        }
-    }
-      };
-
+        },
+    });
 
     const handleSave = async () => {
-        console.log('Save button clicked');
-        
-        await InsertTestSuiteEvent();
-      };
+        // Use tanstack query to handle state update and mutation
+        useMutationInsertTestSuiteEvent.mutate();
+    };
 
     
     return (

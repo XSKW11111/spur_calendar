@@ -8,6 +8,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { TestSuiteEvent } from '@/type/type';
 import useDayJs from '@/hooks/useDayJs';
+import { useQuery } from '@tanstack/react-query';
 
 const CalenderHeaderCell = ({ day, dayInWeek }: { day: string, dayInWeek: string }): React.ReactElement => {
     return (
@@ -38,17 +39,43 @@ const TimeCell = ({time}: {time: string}) => {
 
 const SpurCalendar = () => {
     const dayjs = useDayJs();
-
     const subpabase = createClient();
     const { toast } = useToast()
     const slots = useMemo(() => generateTimeSlots('00:00 AM', 60), [generateTimeSlots]);
     const week = useMemo(() => generateWeek(dayjs().format('YYYY-MM-DD')), [generateWeek]);
-    const [eventList, setEventList] = React.useState<TestSuiteEvent[]>([]);
-    
+   
+    const fetchTestSuites = async (): Promise<TestSuiteEvent[]> => {
+        const { data, error } = await subpabase.from('TestSuiteEvent').select('*');
+
+        if (error) {
+            throw error;
+        }
+        return data;
+    }
+
+    // Use tanstack query to handle data fetching
+    const { data: eventListData, error: eventListError } = useQuery({
+        queryKey: ['TestSuitesEvent'],
+        queryFn: fetchTestSuites,
+      })
+
     // TODO date picker to switch weekview
+
+    useEffect(() => {
+        // show error toast
+        if (eventListError) {
+            toast({
+                title: 'Error',
+                description: eventListError.message,
+                variant: 'destructive',
+            })
+        }
+    }, [eventListError, toast]);
+    
+    // Convert data to an object where the event can be index by date and time
     const eventData: Record<string, Record<string, TestSuiteEvent[]>> = useMemo(() => {
         const data: Record<string, Record<string, TestSuiteEvent[]>> = {};
-        eventList.forEach((event) => {
+        eventListData?.forEach((event) => {
             if (event && event.startTime) {
                 const date = dayjs(event.startTime).format('YYYY-MM-DD');
                 const time = dayjs(event.startTime).format('h A');
@@ -67,26 +94,7 @@ const SpurCalendar = () => {
         }
         });
         return data;
-    }, [eventList]);
-
-    useEffect(() => {
-        const fetchTestSuites = async () => {
-            const { data, error } = await subpabase.from('TestSuiteEvent').select('*');
-            if (error) {
-                console.log(error);
-                toast({
-                    title: 'Error',
-                    description: 'Failed to fetch test suites',
-                    variant: 'destructive'
-                })
-            }
-            else {
-                setEventList(data as TestSuiteEvent[]);
-            }
-
-        }
-        fetchTestSuites();
-    }, [subpabase]);
+    }, [eventListData]);
 
     console.log(eventData);
     return (
