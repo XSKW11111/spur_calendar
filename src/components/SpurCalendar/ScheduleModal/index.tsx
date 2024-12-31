@@ -14,6 +14,8 @@ const ScheduleModal = (): React.ReactElement => {
     const subpabase = createClient();
     const [selectedDayInWeek, setSelectedDayInWeek] = useState<number>(0);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+    const [selectedTime, setSelectedTime] = useState<string>('');
+
     const [name, setName] = useState<string>('');
     const { toast } = useToast()
 
@@ -77,7 +79,7 @@ const ScheduleModal = (): React.ReactElement => {
                         <div className="w-full flex flex-col box-border px-5 py-4 gap-5 bg-gray-100 rounded-xl border border-gray-200">
                             <fieldset>
                                 <label className="block text-sm font-medium text-gray-700">Start Date And Time</label>
-                                <ScheduleDatePicker selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+                                <ScheduleDatePicker selectedDate={selectedDate} setSelectedDate={setSelectedDate} selectedTime={selectedTime} setSelectedTime={setSelectedTime} />
                             </fieldset>
                             <fieldset>
                                 <label className="block text-sm font-medium text-gray-700">Run Weekly on Every</label>

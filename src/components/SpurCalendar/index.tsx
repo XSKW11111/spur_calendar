@@ -2,12 +2,12 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { generateTimeSlots, generateWeek } from '@/components/SpurCalendar/utils/dateUtils';
-import dayjs from 'dayjs';
 import CalendarEvent from '@/components/SpurCalendar/CalendarEvent';
 import ScheduleModal from '@/components/SpurCalendar/ScheduleModal';
 import { createClient } from '@/utils/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { TestSuiteEvent } from '@/type/type';
+import useDayJs from '@/hooks/useDayJs';
 
 const CalenderHeaderCell = ({ day, dayInWeek }: { day: string, dayInWeek: string }): React.ReactElement => {
     return (
@@ -37,6 +37,8 @@ const TimeCell = ({time}: {time: string}) => {
 }
 
 const SpurCalendar = () => {
+    const dayjs = useDayJs();
+
     const subpabase = createClient();
     const { toast } = useToast()
     const slots = useMemo(() => generateTimeSlots('00:00 AM', 60), [generateTimeSlots]);
