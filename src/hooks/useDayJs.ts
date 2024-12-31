@@ -9,7 +9,6 @@ const useDayJs = () => {
     dayjs.extend(timezone)
     dayjs.extend(weekOfYear)
     dayjs.extend(isoWeek)
-
     dayjs.tz.setDefault('America/Los_Angeles')
 
     return dayjs
