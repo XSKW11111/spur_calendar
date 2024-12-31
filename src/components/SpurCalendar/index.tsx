@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { TestSuiteEvent } from '@/type/type';
 import useDayJs from '@/hooks/useDayJs';
 import { useQuery } from '@tanstack/react-query';
+import WeeklySwitchButton from '@/components/SpurCalendar/WeeklySwitchButton';
 
 const CalenderHeaderCell = ({ day, dayInWeek }: { day: string, dayInWeek: string }): React.ReactElement => {
     return (
@@ -41,9 +42,12 @@ const SpurCalendar = () => {
     const dayjs = useDayJs();
     const subpabase = createClient();
     const { toast } = useToast()
+    const [currentStartDayOfTheWeek, setCurrentStartDayOfTheWeek] = React.useState(dayjs().startOf('week'));
     const slots = useMemo(() => generateTimeSlots('00:00 AM', 60), [generateTimeSlots]);
-    const week = useMemo(() => generateWeek(dayjs().format('YYYY-MM-DD')), [generateWeek]);
-   
+    const week = useMemo(() => {
+        return generateWeek(currentStartDayOfTheWeek.format('YYYY-MM-DD'));
+    }, [currentStartDayOfTheWeek]);
+    
     const fetchTestSuites = async (): Promise<TestSuiteEvent[]> => {
         const { data, error } = await subpabase.from('TestSuiteEvent').select('*');
 
@@ -96,12 +100,18 @@ const SpurCalendar = () => {
         return data;
     }, [eventListData]);
 
-    console.log(eventData);
     return (
         <div className="w-full flex flex-col">
             <div className="w-full flex flex-col gap-6">
                 <div className="font-sans text-4xl text-left font-semibold">Scheduled Test Suites</div>
-                <ScheduleModal />
+                <div className="w-full flex flex-row justify-start gap-1">
+                    <ScheduleModal />
+                    <WeeklySwitchButton week={currentStartDayOfTheWeek.format('MM/DD/YYYY')} onLeftClick={() => {
+                        setCurrentStartDayOfTheWeek(currentStartDayOfTheWeek.subtract(1, 'week'));
+                    }} onRightClick={() => {
+                        setCurrentStartDayOfTheWeek(currentStartDayOfTheWeek.add(1, 'week'));
+                    }} />
+                </div>
             </div>
 
             <div className="w-full flex flex-row h-4"/>
