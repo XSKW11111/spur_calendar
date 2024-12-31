@@ -27,7 +27,7 @@ const ScheduleDatePicker = ({ selectedDate, setSelectedDate}: { selectedDate: Da
           )}
         >
 
-          {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+          {selectedDate ? format(selectedDate, "MM/dd/yy") + " at " + format(selectedDate, "h:mm a") + " PST" : <span>Pick a date</span>}
           <CalendarIcon />
 
         </Button>

@@ -6,20 +6,64 @@ import ScheduleButton from '@/components/SpurCalendar/ScheduleButton';
 import ScheduleDatePicker from '@/components/ScheduleDatePicker';
 import { DAY_IN_WEEK } from '@/components/ScheduleDatePicker/constants';
 import { Separator } from "@/components/ui/separator"
-
+import { createClient } from '@/utils/supabase/client'
+import { useToast } from '@/hooks/use-toast'
 import { cn } from '@/lib/utils';
 
 const ScheduleModal = (): React.ReactElement => {
+    const subpabase = createClient();
     const [selectedDayInWeek, setSelectedDayInWeek] = useState<number>(0);
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+    const [name, setName] = useState<string>('');
+    const { toast } = useToast()
 
-    const handleSave = () => {
-        console.log('Save button clicked');
+    const handleReset = () => {
+        setSelectedDayInWeek(0);
+        setSelectedDate(undefined);
+        setName('');
+    };
+    const InsertTestSuiteEvent = async () => {
+        if (!selectedDate) {
+            toast({
+                title: 'Error',
+                description: 'Please select a date',
+                variant: 'destructive',
+            })
+            return;
+        }
+        else{
+        const selectedDateTimestamp = selectedDate.toISOString();
+        console.log(selectedDateTimestamp);
+        const { error } = await subpabase.from('TestSuiteEvent').insert({
+            name: name,
+            startTime: selectedDateTimestamp,
+            weeklyRunDay: selectedDayInWeek,
+        });
+        console.log({ error });
+        if (error) {
+            toast({
+                title: 'Error',
+                description: error.message,
+                variant: 'destructive',
+            })
+        }
+    }
       };
+
+
+    const handleSave = async () => {
+        console.log('Save button clicked');
+        
+        await InsertTestSuiteEvent();
+      };
+
+    
     return (
             <Dialog.Root>
                 <Dialog.Trigger asChild>
-                    <ScheduleButton onClick={() => console.log('hi')}/>
+                    <div onClick={handleReset}>
+                    <ScheduleButton />
+                    </div>
                 </Dialog.Trigger>
                 <Dialog.Portal>
                     <Dialog.Overlay className="fixed inset-0 bg-[#0A0A0A80] bg-opacity-50" />
@@ -28,7 +72,7 @@ const ScheduleModal = (): React.ReactElement => {
                         <div className="w-full flex flex-col gap-6">
                         <fieldset>
                             <label className="block text-sm font-medium text-gray-700">Test Suite</label>
-                            <input type="text" className="mt-1 h-[44px] box-border px-3 py-2block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mt-1 h-[44px] box-border px-3 py-2block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
                         </fieldset>
                         <div className="w-full flex flex-col box-border px-5 py-4 gap-5 bg-gray-100 rounded-xl border border-gray-200">
                             <fieldset>
