@@ -63,7 +63,6 @@ const SpurCalendar = () => {
         queryFn: fetchTestSuites,
       })
 
-    // TODO date picker to switch weekview
 
     useEffect(() => {
         // show error toast
