@@ -1,8 +1,34 @@
+
+
+# Spur Calendar
+
+## Description
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+This repo is created for spurAI 24 hours coding challenge. This repo contains the code for the calendar app which allows users to schedule their events.
 
-First, run the development server:
+## File Structure
+
+- `app` - contains the pages of the app.
+- `components` - contains the components of the app.
+- `components/SpurCalendar` - contains the calendar component, the utility used in the calendar component and the subcomponents.
+- `components/ScheduledDatePicker` - contains the date picker component, the utility used in the date picker component and the subcomponents.
+- `components/Toast` - contains the toast component used in the app.
+- `components/ui` - contains the ui components added by shadcn ui library.
+- `QueryProvider` - contains the tanstack query provider used in the app.
+- `lib` - contains the utils used in the app.
+- `hooks` - contains the hooks used in the app.
+
+## Getting Started
+This app is using Nextjs 14 nd node 18
+please install node 18 first // https://nodejs.org/en/download/
+
+First time running the app or after pulling the latest changes:
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
